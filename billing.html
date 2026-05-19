@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Billing</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+
+body{
+font-family:Arial;
+padding:20px;
+background:#f4f6f9;
+}
+
+.container{
+background:white;
+padding:20px;
+border-radius:12px;
+box-shadow:0 0 10px rgba(0,0,0,0.08);
+}
+
+h1{
+color:#0a2342;
+margin-bottom:20px;
+}
+
+.billing-box{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin-bottom:20px;
+}
+
+input,
+select,
+button{
+padding:10px;
+border:1px solid #ccc;
+border-radius:6px;
+font-size:14px;
+}
+
+#qty{
+width:90px;
+}
+
+#rate{
+width:110px;
+background:#f1f1f1;
+}
+
+#gstBox{
+width:100px;
+background:#f1f1f1;
+}
+
+#customer{
+width:220px;
+}
+
+#payment{
+width:160px;
+}
+
+#product{
+width:220px;
+}
+
+button{
+background:#0a2342;
+color:white;
+border:none;
+cursor:pointer;
+}
+
+button:hover{
+background:#163d6b;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+background:white;
+margin-top:20px;
+}
+
+th,td{
+border:1px solid #ddd;
+padding:12px;
+text-align:center;
+}
+
+th{
+background:#0a2342;
+color:white;
+}
+
+.total-box{
+margin-top:25px;
+background:#f8f9fa;
+padding:20px;
+border-radius:10px;
+width:320px;
+margin-left:auto;
+}
+
+.total-box h3{
+margin:10px 0;
+color:#0a2342;
+}
+
+.action-buttons{
+margin-top:20px;
+display:flex;
+gap:15px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🧾 Billing Section</h1>
+
+<!-- CUSTOMER -->
+
+<div class="billing-box">
+
+<input
+type="text"
+id="customer"
+placeholder="Customer Name"
+>
+
+<select id="payment">
+
+<option value="Cash">Cash</option>
+<option value="UPI">UPI</option>
+<option value="Bank">Bank</option>
+<option value="Card">Card</option>
+
+</select>
+
+</div>
+
+<!-- PRODUCT -->
+
+<div class="billing-box">
+
+<select
+id="product"
+onchange="fillRate()"
+>
+
+<option value="">
+Select Product
+</option>
+
+</select>
+
+<input
+type="number"
+id="qty"
+placeholder="Qty"
+>
+
+<input
+type="number"
+id="rate"
+placeholder="Rate"
+readonly
+>
+
+<input
+type="number"
+id="gstBox"
+placeholder="Enter GST %"
+value="18"
+>
+
+<button onclick="addToBill()">
+Add Product
+</button>
+
+</div>
+
+<!-- TABLE -->
+
+<table id="billTable">
+
+<tr>
+<th>Product</th>
+<th>Qty</th>
+<th>Rate</th>
+<th>GST</th>
+<th>Total</th>
+</tr>
+
+</table>
+
+<!-- TOTALS -->
+
+<div class="total-box">
+
+<h3>
+Subtotal:
+Rs <span id="subtotal">0</span>
+</h3>
+
+<h3>
+GST:
+Rs <span id="gstTotal">0</span>
+</h3>
+
+<h3>
+Grand Total:
+Rs <span id="grandTotal">0</span>
+</h3>
+
+</div>
+
+<!-- BUTTONS -->
+
+<div class="action-buttons">
+
+<button onclick="saveBill()">
+💾 Save Bill
+</button>
+
+<button onclick="downloadInvoice()">
+📄 Download PDF
+</button>
+
+<button onclick="window.print()">
+🖨 Print
+</button>
+
+</div>
+
+</div>
+
+<script src="notification.js"></script>
+
+<script type="module"
+src="billing.js">
+</script>
+
+</body>
+</html>

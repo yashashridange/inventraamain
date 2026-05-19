@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Inventraa Login</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+background:#f4f6f9;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.login-box{
+background:white;
+padding:40px;
+border-radius:12px;
+box-shadow:0 0 10px rgba(0,0,0,0.1);
+width:350px;
+}
+
+h1{
+text-align:center;
+color:#0a2342;
+margin-bottom:25px;
+}
+
+input{
+width:100%;
+padding:12px;
+margin:10px 0;
+border:1px solid #ccc;
+border-radius:6px;
+font-size:15px;
+}
+
+button{
+width:100%;
+padding:12px;
+background:#0a2342;
+color:white;
+border:none;
+border-radius:6px;
+font-size:16px;
+cursor:pointer;
+margin-top:10px;
+}
+
+button:hover{
+background:#0a0437;
+}
+
+p{
+text-align:center;
+margin-top:15px;
+}
+
+a{
+color:#4a5162;
+text-decoration:none;
+font-weight:bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="login-box">
+
+<h1>
+📦 Inventraa
+</h1>
+
+<input
+type="email"
+id="email"
+placeholder="Enter Email"
+>
+
+<input
+type="password"
+id="password"
+placeholder="Enter Password"
+>
+
+<button onclick="login()">
+Login
+</button>
+
+<p>
+Don't have account?
+<a href="signup.html">
+Signup
+</a>
+</p>
+
+</div>
+
+<script type="module">
+
+import app from "./firebase.js";
+
+import {
+getAuth,
+signInWithEmailAndPassword,
+onAuthStateChanged
+}
+from
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+const auth =
+getAuth(app);
+
+//
+// AUTO LOGIN
+//
+onAuthStateChanged(
+auth,
+(user)=>{
+
+if(user){
+
+localStorage.setItem(
+"isLoggedIn",
+"true"
+);
+
+window.location.href =
+"dashboard.html";
+
+}
+
+}
+);
+
+//
+// LOGIN
+//
+window.login =
+async function(){
+
+const email =
+document.getElementById(
+"email"
+).value;
+
+const password =
+document.getElementById(
+"password"
+).value;
+
+if(!email || !password){
+
+alert(
+"Enter Email & Password"
+);
+
+return;
+
+}
+
+try{
+
+await signInWithEmailAndPassword(
+auth,
+email,
+password
+);
+
+localStorage.setItem(
+"isLoggedIn",
+"true"
+);
+
+alert(
+"Login Successful"
+);
+
+window.location.href =
+"dashboard.html";
+
+}
+catch(error){
+
+console.log(error);
+
+alert(
+"Invalid Email or Password"
+);
+
+}
+
+};
+
+</script>
+
+</body>
+
+</html>

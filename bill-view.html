@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+  <title>Bill View</title>
+
+  <style>
+
+    body{
+      font-family: Arial;
+      background:#f4f4f4;
+      padding:20px;
+    }
+
+    .container{
+      max-width:900px;
+      margin:auto;
+      background:white;
+      padding:30px;
+      border-radius:10px;
+    }
+
+    h1{
+      color:#0a2342;
+      text-align:center;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:20px;
+    }
+
+    th,td{
+      border:1px solid #ddd;
+      padding:10px;
+      text-align:center;
+    }
+
+    th{
+      background:#0a2342;
+      color:white;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>🧾 Invoice Details</h1>
+
+  <h3 id="customer"></h3>
+
+  <h3 id="date"></h3>
+
+  <table id="billTable">
+
+    <tr>
+      <th>Product</th>
+      <th>Qty</th>
+      <th>Rate</th>
+      <th>Total</th>
+    </tr>
+
+  </table>
+
+  <h2 id="grandTotal"></h2>
+
+</div>
+
+<script type="module">
+
+import app from "./firebase.js";
+
+import {
+  getFirestore,
+  doc,
+  getDoc
+}
+from
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const db = getFirestore(app);
+
+const params =
+  new URLSearchParams(
+    window.location.search
+  );
+
+const id = params.get("id");
+
+async function loadBill(){
+
+  const billRef =
+    doc(db,"sales",id);
+
+  const billSnap =
+    await getDoc(billRef);
+
+  if(!billSnap.exists()){
+
+    alert("Bill Not Found");
+
+    return;
+
+  }
+
+  const data =
+    billSnap.data();
+
+  document.getElementById(
+    "customer"
+  ).innerText =
+    "Customer: " +
+    (data.customer ||
+    "Walk-in Customer");
+
+  if(data.date?.seconds){
+
+    document.getElementById(
+      "date"
+    ).innerText =
+      "Date: " +
+      new Date(
+        data.date.seconds * 1000
+      ).toLocaleDateString();
+
+  }
+
+  const table =
+    document.getElementById(
+      "billTable"
+    );
+
+  data.items.forEach((item)=>{
+
+    const row =
+      table.insertRow();
+
+    row.insertCell(0).innerText =
+      item.product;
+
+    row.insertCell(1).innerText =
+      item.qty;
+
+    row.insertCell(2).innerText =
+      "₹ " + item.rate;
+
+    row.insertCell(3).innerText =
+      "₹ " + item.total;
+
+  });
+
+  document.getElementById(
+    "grandTotal"
+  ).innerText =
+    "Grand Total: ₹ " +
+    data.total;
+
+}
+
+loadBill();
+
+</script>
+
+</body>
+</html>

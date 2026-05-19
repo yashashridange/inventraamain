@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Inventory</title>
+
+<style>
+
+body{
+font-family:Arial;
+padding:20px;
+background:#f4f6f9;
+}
+
+h1{
+color:#0a2342;
+}
+
+.form-box{
+display:flex;
+flex-wrap:wrap;
+align-items:center;
+gap:10px;
+margin-bottom:20px;
+background:white;
+padding:15px;
+border-radius:10px;
+}
+
+input,
+select{
+width:220px;
+padding:10px;
+border:1px solid #ccc;
+border-radius:6px;
+}
+
+button{
+padding:10px 18px;
+border:none;
+border-radius:6px;
+background:#0a2342;
+color:white;
+cursor:pointer;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+background:white;
+}
+
+th,td{
+border:1px solid #ddd;
+padding:10px;
+text-align:center;
+}
+
+th{
+background:#0a2342;
+color:white;
+}
+
+.low-stock{
+background:#ffd6d6;
+color:red;
+font-weight:bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>📦 Inventory Management</h1>
+
+<div class="form-box">
+
+<input
+type="text"
+id="name"
+placeholder="Product Name">
+
+<input
+type="number"
+id="price"
+placeholder="Price">
+
+<input
+type="number"
+id="qty"
+placeholder="Quantity">
+
+<select id="unit">
+
+<option value="">
+Select Unit
+</option>
+
+<option value="Kg">
+Kg
+</option>
+
+<option value="Liter">
+Liter
+</option>
+
+<option value="Packet">
+Packet
+</option>
+
+<option value="Box">
+Box
+</option>
+
+<option value="Piece">
+Piece
+</option>
+
+</select>
+
+<input
+type="date"
+id="expiry">
+
+<input
+type="number"
+id="gst"
+placeholder="GST %">
+
+<button onclick="addProduct()">
+Add Product
+</button>
+
+</div>
+
+<table id="productTable">
+
+<tr>
+
+<th>Name</th>
+
+<th>Price</th>
+
+<th>Qty</th>
+
+<th>Unit</th>
+
+<th>Expiry</th>
+
+<th>GST</th>
+
+<th>Status</th>
+
+</tr>
+
+</table>
+
+<script type="module" src="app.js"></script>
+
+</body>
+</html>
