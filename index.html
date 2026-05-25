@@ -8,12 +8,15 @@
 <meta name="viewport"
 content="width=device-width, initial-scale=1.0">
 
-<title>Inventraa Login</title>
+<title>
+Inventraa Admin Login
+</title>
 
 <style>
 
 body{
 margin:0;
+padding:0;
 font-family:Arial;
 background:#f4f6f9;
 display:flex;
@@ -23,53 +26,83 @@ height:100vh;
 }
 
 .login-box{
+
 background:white;
-padding:40px;
+
+padding:35px;
+
+width:320px;
+
 border-radius:12px;
-box-shadow:0 0 10px rgba(0,0,0,0.1);
-width:350px;
+
+box-shadow:0 0 15px rgba(0,0,0,0.1);
+
+text-align:center;
+
 }
 
 h1{
-text-align:center;
+
 color:#0a2342;
+
 margin-bottom:25px;
+
 }
 
 input{
+
 width:100%;
+
 padding:12px;
+
 margin:10px 0;
+
 border:1px solid #ccc;
+
 border-radius:6px;
+
 font-size:15px;
+
+box-sizing:border-box;
+
 }
 
 button{
+
 width:100%;
+
 padding:12px;
+
 background:#0a2342;
+
 color:white;
+
 border:none;
+
 border-radius:6px;
+
 font-size:16px;
+
 cursor:pointer;
+
 margin-top:10px;
+
 }
 
 button:hover{
-background:#0a0437;
+
+background:#163d6b;
+
 }
 
-p{
-text-align:center;
+.small{
+
 margin-top:15px;
-}
 
-a{
-color:#4a5162;
-text-decoration:none;
-font-weight:bold;
+font-size:14px;
+
+color:gray;
+
 }
 
 </style>
@@ -81,13 +114,13 @@ font-weight:bold;
 <div class="login-box">
 
 <h1>
-📦 Inventraa
+🔐 Admin Login
 </h1>
 
 <input
 type="email"
 id="email"
-placeholder="Enter Email"
+placeholder="Enter Admin Email"
 >
 
 <input
@@ -100,7 +133,11 @@ placeholder="Enter Password"
 Login
 </button>
 
+<div class="small">
 
+Inventraa Store Management
+
+</div>
 
 </div>
 
@@ -111,7 +148,8 @@ import app from "./firebase.js";
 import {
 getAuth,
 signInWithEmailAndPassword,
-onAuthStateChanged
+setPersistence,
+browserLocalPersistence
 }
 from
 "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -120,29 +158,15 @@ const auth =
 getAuth(app);
 
 //
-// AUTO LOGIN
+// KEEP LOGIN ACTIVE
 //
-onAuthStateChanged(
+await setPersistence(
 auth,
-(user)=>{
-
-if(user){
-
-localStorage.setItem(
-"isLoggedIn",
-"true"
-);
-
-window.location.href =
-"dashboard.html";
-
-}
-
-}
+browserLocalPersistence
 );
 
 //
-// LOGIN
+// LOGIN FUNCTION
 //
 window.login =
 async function(){
@@ -156,6 +180,21 @@ const password =
 document.getElementById(
 "password"
 ).value;
+
+//
+// ONLY ADMIN LOGIN
+//
+if(
+email !== "test@gmail.com"
+){
+
+alert(
+"Only Admin Login Allowed"
+);
+
+return;
+
+}
 
 if(!email || !password){
 
@@ -180,12 +219,8 @@ localStorage.setItem(
 "true"
 );
 
-alert(
-"Login Successful"
-);
-
 window.location.href =
-"dashboard.html";
+"./dashboard.html";
 
 }
 catch(error){
