@@ -1,53 +1,73 @@
 import app from "./firebase.js";
 
 import {
-  getFirestore,
-  collection,
-  addDoc,
-  getDocs,
-  updateDoc,
-  doc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+getFirestore,
+collection,
+addDoc,
+getDocs,
+updateDoc,
+doc
+}
+from
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const db = getFirestore(app);
+const db =
+getFirestore(app);
 
 let products = [];
+
 let billItems = [];
+
 let subtotal = 0;
 
 //
 // LOAD PRODUCTS
 //
-async function loadProducts() {
+async function loadProducts(){
 
-  const productSelect =
-    document.getElementById("product");
+const productSelect =
+document.getElementById(
+"product"
+);
 
-  productSelect.innerHTML =
-    `<option value="">Select Product</option>`;
+productSelect.innerHTML = `
 
-  products = [];
+<option value="">
+Select Product
+</option>
 
-  const snapshot = await getDocs(
-    collection(db, "products")
-  );
+`;
 
-  snapshot.forEach((docItem) => {
+products = [];
 
-    const data = docItem.data();
+const querySnapshot =
+await getDocs(
+collection(db,"products")
+);
 
-    products.push({
-      id: docItem.id,
-      ...data
-    });
+querySnapshot.forEach((docItem)=>{
 
-    productSelect.innerHTML += `
-      <option value="${docItem.id}">
-        ${data.name}
-      </option>
-    `;
+const data =
+docItem.data();
 
-  });
+products.push({
+
+id: docItem.id,
+
+...data
+
+});
+
+productSelect.innerHTML += `
+
+<option value="${docItem.id}">
+${data.name}
+</option>
+
+`;
+
+});
+
 }
 
 loadProducts();
@@ -55,273 +75,645 @@ loadProducts();
 //
 // AUTO FILL RATE + GST
 //
-window.fillRate = function () {
+window.fillRate =
+function(){
 
-  const id =
-    document.getElementById("product").value;
+const productId =
+document.getElementById(
+"product"
+).value;
 
-  const product =
-    products.find(p => p.id === id);
+const selectedProduct =
+products.find(
 
-  if (product) {
+(item)=>
 
-    document.getElementById("rate").value =
-      product.price || 0;
+item.id === productId
 
-    document.getElementById("gstBox").value =
-      product.gst || 0;
+);
 
-  } else {
+if(selectedProduct){
 
-    document.getElementById("rate").value = "";
-    document.getElementById("gstBox").value = "";
-  }
+document.getElementById(
+"rate"
+).value =
+selectedProduct.price || 0;
+
+document.getElementById(
+"gstBox"
+).value =
+selectedProduct.gst || 0;
+
+}
+else{
+
+document.getElementById(
+"rate"
+).value = "";
+
+document.getElementById(
+"gstBox"
+).value = "";
+
+}
+
 };
 
 //
-// ADD TO BILL
+// ADD PRODUCT
 //
-window.addToBill = function () {
+window.addToBill =
+function(){
 
-  const id = document.getElementById("product").value;
-  const qty = Number(document.getElementById("qty").value);
-  const rate = Number(document.getElementById("rate").value);
-  const gst = Number(document.getElementById("gstBox").value || 0);
+const productId =
+document.getElementById(
+"product"
+).value;
 
-  if (!id || !qty || !rate) {
-    alert("Select product and quantity");
-    return;
-  }
+const qty =
+Number(
+document.getElementById(
+"qty"
+).value
+);
 
-  const product = products.find(p => p.id === id);
+const rate =
+Number(
+document.getElementById(
+"rate"
+).value
+);
 
-  if (!product) return;
+const gst =
+Number(
+document.getElementById(
+"gstBox"
+).value
+);
 
-  const total = rate * qty;
+if(!productId || !qty){
 
-  subtotal += total;
+alert(
+"Select Product & Qty"
+);
 
-  billItems.push({
-    product: product.name,
-    qty,
-    rate,
-    gst,
-    total
-  });
+return;
 
-  updateTable();
+}
+
+const product =
+products.find(
+(p)=> p.id === productId
+);
+
+if(!product){
+
+alert(
+"Product not found"
+);
+
+return;
+
+}
+
+//
+// STOCK CHECK
+//
+if(qty > Number(product.qty || 0)){
+
+alert(
+"Low Stock"
+);
+
+return;
+
+}
+
+const total =
+rate * qty;
+
+subtotal += total;
+
+billItems.push({
+
+product:
+product.name,
+
+qty,
+
+rate,
+
+gst,
+
+total
+
+});
+
+updateBillTable();
+
+//
+// CLEAR QTY
+//
+document.getElementById(
+"qty"
+).value = "";
+
 };
 
 //
 // UPDATE TABLE
 //
-function updateTable() {
+function updateBillTable(){
 
-  const table =
-    document.getElementById("billTable");
+const table =
+document.getElementById(
+"billTable"
+);
 
-  table.innerHTML = `
-    <tr>
-      <th>Product</th>
-      <th>Qty</th>
-      <th>Rate</th>
-      <th>GST</th>
-      <th>Total</th>
-    </tr>
-  `;
+table.innerHTML = `
 
-  billItems.forEach(item => {
+<tr>
 
-    table.innerHTML += `
-      <tr>
-        <td>${item.product}</td>
-        <td>${item.qty}</td>
-        <td>Rs. ${item.rate}</td>
-        <td>${item.gst}%</td>
-        <td>Rs. ${item.total}</td>
-      </tr>
-    `;
+<th>Product</th>
 
-  });
+<th>Qty</th>
 
-  let gstTotal = 0;
+<th>Rate</th>
 
-  billItems.forEach(item => {
-    gstTotal += (item.rate * item.qty * item.gst / 100);
-  });
+<th>GST</th>
 
-  document.getElementById("subtotal").innerText =
-    subtotal.toFixed(2);
+<th>Total</th>
 
-  document.getElementById("gstTotal").innerText =
-    gstTotal.toFixed(2);
+</tr>
 
-  document.getElementById("grandTotal").innerText =
-    (subtotal + gstTotal).toFixed(2);
+`;
+
+billItems.forEach((item)=>{
+
+table.innerHTML += `
+
+<tr>
+
+<td>
+${item.product}
+</td>
+
+<td>
+${item.qty}
+</td>
+
+<td>
+₹ ${item.rate}
+</td>
+
+<td>
+${item.gst}%
+</td>
+
+<td>
+₹ ${item.total}
+</td>
+
+</tr>
+
+`;
+
+});
+
+const gstTotal =
+billItems.reduce(
+
+(sum,item)=>
+
+sum +
+(
+(item.rate * item.qty)
+*
+(item.gst / 100)
+),
+
+0
+
+);
+
+const grandTotal =
+subtotal + gstTotal;
+
+document.getElementById(
+"subtotal"
+).innerText =
+subtotal.toFixed(2);
+
+document.getElementById(
+"gstTotal"
+).innerText =
+gstTotal.toFixed(2);
+
+document.getElementById(
+"grandTotal"
+).innerText =
+grandTotal.toFixed(2);
+
 }
 
 //
 // SAVE BILL
 //
-window.saveBill = async function () {
-   if (!billItems.length) {
-     alert("No items");
-     return;
-   }
+window.saveBill =
+async function(){
 
-   let gstTotal = 0;
+if(billItems.length === 0){
 
-   billItems.forEach(item => {
-     gstTotal += (item.rate * item.qty * item.gst / 100);
-   });
+alert(
+"No products added"
+);
 
-   const grandTotal = subtotal + gstTotal;
+return;
 
-   const customerInput = document.getElementById("customer");
-
-   const customer =
-     customerInput && customerInput.value.trim()
-       ? customerInput.value.trim()
-       : "Walk-in Customer";
-
-   await addDoc(collection(db, "sales"), {
-     customer: customer,
-     items: billItems,
-     subtotal,
-     gst: gstTotal,
-     total: grandTotal,
-     date: new Date()
-   });
-};
-alert("Bill Saved");
-
-  billItems = [];
-  subtotal = 0;
-  updateTable();
-  loadProducts();
-
-
-//
-// PDF DOWNLOAD (FIXED GST + CLEAN)
-//
-window.downloadInvoice = function () {
-
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF();
-
-  const money = (v) => "Rs. " + Number(v || 0).toFixed(2);
-
-  const customerInput = document.getElementById("customer");
+}
 
 const customer =
-customerInput && customerInput.value.trim() !== ""
-  ? customerInput.value.trim()
-  : "Walk-in Customer";
+document.getElementById(
+"customer"
+).value || "Walk-in Customer";
 
-  const payment =
-    document.getElementById("payment")?.value || "Cash";
+const payment =
+document.getElementById(
+"payment"
+).value || "Cash";
 
-  const date = new Date().toLocaleDateString();
+const gstTotal =
+billItems.reduce(
 
-  let y = 20;
+(sum,item)=>
 
-  // ================= HEADER =================
-  pdf.setFillColor(10, 35, 66);
-  pdf.rect(0, 0, 210, 35, "F");
+sum +
+(
+(item.rate * item.qty)
+*
+(item.gst / 100)
+),
 
-  pdf.setTextColor(255, 255, 255);
-  pdf.setFontSize(18);
-  pdf.text("Matoshree General Store", 80, 20);
+0
 
-  pdf.setFontSize(10);
-  pdf.text("Store Address: Main Market, City", 60, 28);
+);
 
-  
-  // ================= INFO =================
-  pdf.setTextColor(0, 0, 0);
-  pdf.setFontSize(12);
+const grandTotal =
+subtotal + gstTotal;
 
-  pdf.text("Customer: " + customer, 15, 50);
-  pdf.text("Payment: " + payment, 140, 50);
-  pdf.text("Date: " + date, 15, 58);
+try{
 
-  // ================= TABLE HEADER =================
-  y = 75;
+//
+// SAVE SALES
+//
+await addDoc(
+collection(db,"sales"),
+{
 
-  pdf.setFillColor(30, 30, 30);
-  pdf.rect(10, y, 190, 10, "F");
+customer,
 
-  pdf.setTextColor(255, 255, 255);
-  pdf.setFontSize(11);
+payment,
 
-  pdf.text("Product", 15, y + 7);
-  pdf.text("Qty", 75, y + 7);
-  pdf.text("Rate", 100, y + 7);
-  pdf.text("GST%", 130, y + 7);
-  pdf.text("Total", 160, y + 7);
+items: billItems,
 
-  // ================= ITEMS =================
-  pdf.setTextColor(0, 0, 0);
+subtotal,
 
-  y += 15;
+gst: gstTotal,
 
-  let subtotal = 0;
-  let gstTotal = 0;
+total: grandTotal,
 
-  billItems.forEach((item, i) => {
+date: new Date()
 
-    const rate = Number(item.rate || 0);
-    const qty = Number(item.qty || 0);
-    const gst = Number(item.gst || 0);
+}
+);
 
-    const itemTotal = rate * qty;
-    const gstAmount = itemTotal * gst / 100;
+//
+// UPDATE STOCK
+//
+for(const item of billItems){
 
-    subtotal += itemTotal;
-    gstTotal += gstAmount;
+const product =
+products.find(
 
-    if (i % 2 === 0) {
-      pdf.setFillColor(245, 245, 245);
-      pdf.rect(10, y - 5, 190, 10, "F");
-    }
+(p)=>
 
-    pdf.text(String(item.product), 15, y);
-    pdf.text(String(qty), 75, y);
-    pdf.text(money(rate), 100, y);
-    pdf.text(gst + "%", 130, y);
-    pdf.text(money(itemTotal + gstAmount), 160, y);
+p.name === item.product
 
-    y += 10;
-  });
+);
 
-  // ================= TOTALS =================
-  const grandTotal = subtotal + gstTotal;
+if(product){
 
-  y += 10;
+const updatedQty =
 
-  pdf.setDrawColor(0);
-  pdf.rect(120, y, 80, 40);
+Number(product.qty || 0)
 
-  pdf.setFontSize(11);
+-
 
-  pdf.text("Subtotal:", 125, y + 10);
-  pdf.text(money(subtotal), 170, y + 10);
+Number(item.qty || 0);
 
-  pdf.text("GST:", 125, y + 18);
-  pdf.text(money(gstTotal), 170, y + 18);
+await updateDoc(
 
-  pdf.setFontSize(13);
-  pdf.text("Grand Total:", 125, y + 30);
-  pdf.text(money(grandTotal), 170, y + 30);
+doc(
+db,
+"products",
+product.id
+),
 
-  // ================= FOOTER FIX (IMPORTANT) =================
-  y += 60;
+{
+qty: updatedQty
+}
 
-  pdf.setFontSize(12);
-  pdf.setTextColor(10, 35, 66);
+);
 
-  pdf.text("Thank You For Shopping With Us!", 55, y);
+}
 
+}
 
-  pdf.save("Invoice.pdf");
+alert(
+"Bill Saved Successfully"
+);
+
+//
+// RESET BILL
+//
+billItems = [];
+
+subtotal = 0;
+
+updateBillTable();
+
+loadProducts();
+
+}
+catch(error){
+
+console.log(error);
+
+alert(
+"Error Saving Bill"
+);
+
+}
+
+};
+
+//
+// DOWNLOAD PDF
+//
+window.downloadInvoice =
+function(){
+
+const {
+jsPDF
+} = window.jspdf;
+
+const pdf =
+new jsPDF();
+
+const customer =
+document.getElementById(
+"customer"
+).value || "Walk-in Customer";
+
+const payment =
+document.getElementById(
+"payment"
+).value || "Cash";
+
+const date =
+new Date()
+.toLocaleDateString();
+
+let y = 20;
+
+pdf.setFontSize(24);
+
+pdf.text(
+"Matoshree Mart",
+60,
+20
+);
+
+pdf.setFontSize(12);
+
+pdf.text(
+"Retail Billing Invoice",
+72,
+28
+);
+
+pdf.line(
+10,
+35,
+200,
+35
+);
+
+pdf.text(
+"Customer: " + customer,
+10,
+45
+);
+
+pdf.text(
+"Payment: " + payment,
+140,
+45
+);
+
+pdf.text(
+"Date: " + date,
+10,
+53
+);
+
+pdf.setFillColor(
+10,
+35,
+66
+);
+
+pdf.rect(
+10,
+60,
+190,
+10,
+"F"
+);
+
+pdf.setTextColor(
+255,
+255,
+255
+);
+
+pdf.text(
+"Product",
+15,
+67
+);
+
+pdf.text(
+"Qty",
+75,
+67
+);
+
+pdf.text(
+"Rate",
+100,
+67
+);
+
+pdf.text(
+"GST",
+130,
+67
+);
+
+pdf.text(
+"Total",
+160,
+67
+);
+
+pdf.setTextColor(
+0,
+0,
+0
+);
+
+y = 70;
+
+billItems.forEach((item)=>{
+
+y += 10;
+
+pdf.text(
+String(item.product),
+15,
+y
+);
+
+pdf.text(
+String(item.qty),
+78,
+y
+);
+
+pdf.text(
+"₹ " + item.rate,
+95,
+y
+);
+
+pdf.text(
+(item.gst || 0) + "%",
+130,
+y
+);
+
+pdf.text(
+"₹ " + item.total,
+160,
+y
+);
+
+});
+
+y += 20;
+
+const gstTotal =
+billItems.reduce(
+
+(sum,item)=>
+
+sum +
+(
+(item.rate * item.qty)
+*
+(item.gst / 100)
+),
+
+0
+
+);
+
+const grandTotal =
+subtotal + gstTotal;
+
+pdf.line(
+120,
+y-5,
+200,
+y-5
+);
+
+pdf.text(
+"Subtotal:",
+130,
+y
+);
+
+pdf.text(
+"₹ " +
+subtotal.toFixed(2),
+170,
+y
+);
+
+y += 10;
+
+pdf.text(
+"GST:",
+130,
+y
+);
+
+pdf.text(
+"₹ " +
+gstTotal.toFixed(2),
+170,
+y
+);
+
+y += 10;
+
+pdf.setFontSize(14);
+
+pdf.text(
+"Grand Total:",
+130,
+y
+);
+
+pdf.text(
+"₹ " +
+grandTotal.toFixed(2),
+170,
+y
+);
+
+y += 25;
+
+pdf.setFontSize(12);
+
+pdf.text(
+"Thank You For Shopping!",
+65,
+y
+);
+
+y += 8;
+
+pdf.text(
+"Visit Again 😊",
+82,
+y
+);
+
+pdf.save(
+"Invoice.pdf"
+);
+
 };
