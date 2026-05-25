@@ -8,135 +8,127 @@
 <meta name="viewport"
 content="width=device-width, initial-scale=1.0">
 
-<title>Inventraa Dashboard</title>
+<title>
+Dashboard
+</title>
 
 <style>
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial;
-}
-
 body{
-display:flex;
-height:100vh;
+margin:0;
+font-family:Arial;
 background:#f4f6f9;
-overflow:hidden;
+display:flex;
 }
-
-/* SIDEBAR */
 
 .sidebar{
-width:270px;
+
+width:240px;
+
 background:#0a2342;
+
+height:100vh;
+
 color:white;
-padding:20px;
-overflow-y:auto;
+
+padding-top:20px;
+
+position:fixed;
+
 }
 
 .logo{
-font-size:30px;
+
+text-align:center;
+
+font-size:24px;
+
 font-weight:bold;
-text-align:center;
-margin-bottom:10px;
+
+margin-bottom:30px;
+
 }
 
-.shop-name{
-text-align:center;
-font-size:18px;
-margin-bottom:25px;
-color:#d6e4ff;
-}
+.sidebar button{
 
-/* FINANCIAL YEAR */
+width:90%;
 
-.financial-box{
-background:#163d6b;
-padding:12px;
-border-radius:10px;
-margin-bottom:25px;
-}
+margin:10px;
 
-.financial-box label{
-display:block;
-margin-bottom:8px;
-font-size:14px;
-}
-
-.financial-box select{
-width:100%;
-padding:10px;
-border:none;
-border-radius:6px;
-font-size:15px;
-}
-
-/* MENU */
-
-.menu button{
-width:100%;
 padding:14px;
-margin:10px 0;
+
 border:none;
-border-radius:8px;
+
 background:#163d6b;
+
 color:white;
+
 font-size:16px;
+
+border-radius:8px;
+
 cursor:pointer;
+
 text-align:left;
-transition:0.2s;
+
 }
 
-.menu button:hover{
-background:#21548f;
-transform:scale(1.02);
+.sidebar button:hover{
+
+background:#1d4f87;
+
 }
-
-
-
-/* RIGHT */
 
 .main{
-flex:1;
-background:white;
-display:flex;
-flex-direction:column;
-}
 
-/* TOP BAR */
+margin-left:240px;
+
+padding:20px;
+
+width:100%;
+
+}
 
 .topbar{
-height:70px;
+
 background:white;
-border-bottom:1px solid #ddd;
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:0 25px;
-}
 
-.topbar h2{
-color:#0a2342;
-}
+padding:20px;
 
-.system-status{
-background:#d4edda;
-color:#155724;
-padding:8px 14px;
-border-radius:20px;
-font-size:14px;
-font-weight:bold;
-}
+border-radius:10px;
 
-/* IFRAME */
+box-shadow:0 0 10px rgba(0,0,0,0.1);
+
+margin-bottom:20px;
+
+}
 
 iframe{
-flex:1;
+
 width:100%;
+
+height:85vh;
+
 border:none;
+
 background:white;
+
+border-radius:10px;
+
+box-shadow:0 0 10px rgba(0,0,0,0.1);
+
+}
+
+.status{
+
+margin-top:10px;
+
+font-size:14px;
+
+color:green;
+
+font-weight:bold;
+
 }
 
 </style>
@@ -145,99 +137,61 @@ background:white;
 
 <body>
 
-<!-- SIDEBAR -->
-
 <div class="sidebar">
 
 <div class="logo">
-🛒 Matoshree mart
-</div>
 
-<div class="shop-name">
- inventraa
-</div>
-
-<!-- FINANCIAL YEAR -->
-
-<div class="financial-box">
-
-<label>
-Financial Year
-</label>
-
-<select
-id="financialYear"
-onchange="saveFinancialYear()"
->
-
-<option value="2025-26">
-2025-26
-</option>
-
-<option value="2026-27">
-2026-27
-</option>
-
-<option value="2027-28">
-2027-28
-</option>
-
-</select>
+📦 Inventraa
 
 </div>
-
-<!-- MENU -->
-
-<div class="menu">
 
 <button onclick="loadPage('inventory.html')">
+
 📦 Inventory
+
 </button>
 
 <button onclick="loadPage('billing.html')">
+
 🧾 Billing
+
 </button>
 
 <button onclick="loadPage('report.html')">
+
 📊 Sales Report
+
 </button>
 
-<button onclick="loadPage('purchase-report.html')">
+<button onclick="loadPage('purchase.html')">
+
 📦 Purchase Report
+
 </button>
 
 <button onclick="loadPage('cash-entry.html')">
+
 💰 Cash / Bank
-</button>
 
-<button class="logout"
-onclick="logout()">
-🚪 Logout
 </button>
 
 </div>
-
-</div>
-
-<!-- RIGHT SIDE -->
 
 <div class="main">
-
-<!-- TOPBAR -->
 
 <div class="topbar">
 
 <h2>
-Store Management System
+Matoshree Mart
 </h2>
 
-<div class="system-status">
+<div class="status">
+
 🟢 System Active
-</div>
 
 </div>
 
-<!-- CONTENT -->
+</div>
 
 <iframe
 id="contentFrame"
@@ -246,103 +200,14 @@ src="inventory.html">
 
 </div>
 
-<script type="module">
+<script>
 
-import app from "./firebase.js";
-
-import {
-getAuth,
-signOut
-}
-from
-"https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-const auth =
-getAuth(app);
-
-//
-// LOAD PAGE
-//
 window.loadPage =
 function(page){
 
 document.getElementById(
 "contentFrame"
 ).src = page;
-
-};
-
-//
-// LOGOUT
-//
-window.logout =
-async function(){
-
-try{
-
-await signOut(auth);
-
-localStorage.removeItem(
-"isLoggedIn"
-);
-
-window.location.href =
-"login.html";
-
-}
-
-catch(error){
-
-console.log(error);
-
-alert("Logout Error");
-
-}
-
-};
-
-//
-// SAVE FINANCIAL YEAR
-//
-window.saveFinancialYear =
-function(){
-
-const year =
-document.getElementById(
-"financialYear"
-).value;
-
-localStorage.setItem(
-"financialYear",
-year
-);
-
-};
-
-//
-// PAGE LOAD
-//
-window.onload =
-function(){
-
-document.getElementById(
-"contentFrame"
-).src =
-"inventory.html";
-
-const savedYear =
-localStorage.getItem(
-"financialYear"
-);
-
-if(savedYear){
-
-document.getElementById(
-"financialYear"
-).value =
-savedYear;
-
-}
 
 };
 
